@@ -1,10 +1,9 @@
-FROM golang:1.13.1-alpine
+FROM golang:1.14
 
 WORKDIR /src/git-auto-sync
-COPY *  .
+COPY .  .
 ENV GO111MODULE=on
 ENV GOPROXY https://goproxy.io
-# build 优先用本地vendor文件
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor
 
 
