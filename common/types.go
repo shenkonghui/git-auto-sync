@@ -5,7 +5,8 @@ import (
 )
 
 type GitOptions struct {
-	Interval time.Duration
+	CommitInterval time.Duration
+	PushInterval time.Duration
 	Directory string
 	CommitName string
 	CommitEmail string

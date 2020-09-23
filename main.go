@@ -5,9 +5,5 @@ import (
 )
 
 func main() {
-	//pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
-	//flag.Parse()
-	//defer glog.Flush()
-
 	cmd.Execute()
 }

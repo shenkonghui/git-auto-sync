@@ -36,6 +36,8 @@ func NewGitSync() *cobra.Command {
 }
 
 func AddFlag(cmd *cobra.Command,opts * types.GitOptions){
+	cmd.Flags().DurationVar(&opts.CommitInterval, "commit-interval", time.Minute,"Specify the commit interval")
+	cmd.Flags().DurationVar(&opts.PushInterval, "push-interval", time.Hour,"Specify the gpush interval")
 	cmd.Flags().StringVarP(&opts.Directory, "path","p", ".","Specify the git path")
 	cmd.Flags().StringVarP(&opts.CommitName, "name","n", "GIT_AUTO_SYNC","Specify commit name")
 	cmd.Flags().StringVarP(&opts.CommitEmail, "email","e", "","Specify commit email")
@@ -43,7 +45,6 @@ func AddFlag(cmd *cobra.Command,opts * types.GitOptions){
 
 func newGitOptions() * types.GitOptions{
 	ops := &types.GitOptions{}
-	ops.Interval = time.Second * 1
 	return ops
 }
 
@@ -58,12 +59,31 @@ func Execute() {
 
 func run(opt * types.GitOptions){
 
-	for {
-		select {
-			case <- time.After(opt.Interval):
+	stop := make(chan int)
+	tc := time.NewTicker(opt.CommitInterval)
+	tp := time.NewTicker(opt.PushInterval)
+
+	go func (){
+		for {
+			select {
+			case <-tc.C:
+				glog.V(4).Info("try to commit")
+				AutoCommit(opt)
+			}
 		}
-		AutoCommit(opt)
-	}
+	}()
+
+	go func (){
+		for {
+			select {
+			case <-tp.C:
+				glog.V(4).Info("try to push")
+				AutoPush(opt)
+			}
+		}
+	}()
+
+	<-stop
 }
 
 func AutoCommit(opt * types.GitOptions){
@@ -100,10 +120,24 @@ func AutoCommit(opt * types.GitOptions){
 		return
 	}
 
-	obj, err := r.CommitObject(commit)
+	_, err = r.CommitObject(commit)
 	if err != nil{
 		glog.Errorf(err.Error())
 		return
 	}
-	glog.Info("commit success, %v", obj)
+	glog.Info("commit success")
+}
+
+func AutoPush(opt * types.GitOptions){
+	r, err := git.PlainOpen(opt.Directory)
+	if err != nil{
+		glog.Errorf(err.Error())
+		return
+	}
+	err = r.Push(&git.PushOptions{})
+	if err != nil{
+		glog.Errorf(err.Error())
+		return
+	}
+	glog.Info("push success")
 }
