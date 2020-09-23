@@ -64,6 +64,7 @@ func run(opt * types.GitOptions){
 	tp := time.NewTicker(opt.PushInterval)
 
 	go func (){
+		AutoCommit(opt)
 		for {
 			select {
 			case <-tc.C:
@@ -74,6 +75,8 @@ func run(opt * types.GitOptions){
 	}()
 
 	go func (){
+		AutoPush(opt)
+		time.Sleep(time.Second * 10)
 		for {
 			select {
 			case <-tp.C:
