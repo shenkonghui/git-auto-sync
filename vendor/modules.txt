@@ -79,7 +79,6 @@ github.com/sergi/go-diff/diffmatchpatch
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.3
-## explicit
 github.com/spf13/pflag
 # github.com/xanzy/ssh-agent v0.2.1
 github.com/xanzy/ssh-agent
