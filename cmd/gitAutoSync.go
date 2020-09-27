@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 )
+
 func NewGitSync() *cobra.Command {
 
 	opts := newGitOptions()
@@ -46,7 +47,6 @@ func newGitOptions() * types.GitOptions{
 	ops := &types.GitOptions{}
 	return ops
 }
-
 
 func Execute() {
 	rootCmd := NewGitSync()
